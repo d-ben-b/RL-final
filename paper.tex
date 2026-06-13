@@ -182,10 +182,11 @@ $100{,}000$ environment steps $\approx 97$ PPO updates.
 \textbf{Reward shaping.} \code{highway-env}'s reward trades high speed against
 collisions and lane-change penalties. Three \emph{driving styles} are exposed
 that change the reward coefficients (Table~\ref{tab:reward}). These coefficients
-were tuned empirically rather than chosen analytically: with the default
-collision penalty of $-1.0$ and \code{high\_speed\_reward}$=2.0$, agents largely
-ignored collisions and maintained maximum speed; raising the penalty to $-4.0$
-was required before collision avoidance registered in the learned policy.
+were tuned empirically rather than chosen analytically: with the high-speed
+reward raised to the aggressive value of $2.0$ but the collision penalty kept at
+the default $-1.0$, agents largely ignored collisions and maintained maximum
+speed; raising the penalty to $-4.0$ was required before collision avoidance
+registered in the learned policy.
 Crucially, the \textbf{absolute return scale differs
 between styles} (e.g.\ aggressive multiplies the high-speed term), so episodic
 returns are only comparable \emph{within} a style. Cross-style comparison is
@@ -380,12 +381,14 @@ approaches the approximate theoretical ceiling ($266.7$). This near-parity
 indicates that for this task, architecture or algorithm family does not
 determine how high the agent can eventually perform; all three discover
 comparably high-quality policies. There is a mechanical reason the returns
-collapse together: under the aggressive style the high-speed term pays $+2.0$
-\emph{every step} the agent is fast, while a collision is penalised only $-4.0$
-\emph{once}. Over a 400-step horizon the return is therefore dominated by a
-speed integral, and a late crash barely dents it---so episodic return is almost
-blind to exactly the failure mode we care about. This is the first hint of why
-return and behaviour decouple so sharply in Section~\ref{sec:behav}.
+collapse together: the aggressive style heavily rewards sustained high speed
+($+2.0$ per step), so a fast policy that crashes midway can accumulate a return
+comparable to a slower policy that survives the full horizon---the single
+$-4.0$ terminal penalty is small relative to the hundreds of steps of
+accumulated speed reward. (A crash does truncate the episode, so an \emph{early}
+crash, which forfeits that reward, remains costly; it is \emph{mid-to-late}
+crashes that the return fails to separate from safe driving.) This is the first
+hint of why return and behaviour decouple so sharply in Section~\ref{sec:behav}.
 
 \textbf{Variance across seeds.} The most striking finding is the
 \emph{ordering of cross-seed stability}: Double DQN achieves the lowest
