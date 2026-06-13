@@ -451,17 +451,17 @@ others ($100\%$ crash). DQN is markedly more consistent ($11.3\%$ avg).}
 
 The behaviour metrics reveal a striking divergence despite near-identical training
 returns. \textbf{DQN+MLP achieves the lowest crash rate} ($11.3\%$) with
-$368.5$ average survival steps. This figure warrants caution. Qualitative
-inspection of rendered episodes shows the DQN agent jittering left--right almost
-every step rather than smoothly steering around obstacles: it changes lanes
-\emph{far} more than any other model ($155$ per episode on average, with two
-seeds exceeding $260$---near-continuous lane switching in a $400$-step episode).
-Because the aggressive \emph{training} reward \emph{positively} rewards lane
-changes ($+0.2$; Table~\ref{tab:reward}), the policy is actively incentivised to
-switch lanes, so the low crash rate may be partly an artifact of a degenerate
-``swerve-to-survive'' strategy rather than a genuinely intelligent avoidance
-policy. The rendered video is released so that this can be judged directly rather
-than taking the crash number at face value. In contrast, \textbf{PPO+Attention and PPO+MLP exhibit
+$368.5$ average survival steps. This figure warrants caution. DQN changes lanes
+\emph{far} more than any other model on average ($155$ per episode), but the
+count is highly seed- and episode-dependent: across individual rollouts it ranges
+from $0$ (driving straight in lane) to nearly $400$ (switching lanes almost every
+step) while still surviving. Because the aggressive \emph{training} reward
+\emph{positively} rewards lane changes ($+0.2$; Table~\ref{tab:reward}), part of
+DQN's low crash rate may reflect a degenerate ``swerve-to-survive'' strategy that
+exploits this incentive rather than principled obstacle avoidance; we flag this
+as an open caveat. A supplementary \code{highway-v0} video accompanies this
+comparison, showing PPO+Attention colliding while DQN survives on identical
+traffic. In contrast, \textbf{PPO+Attention and PPO+MLP exhibit
 extreme bimodal behaviour}: some seeds converge to a fully passive policy
 ($0$--$3.3\%$ crash, $\approx 0$ lane changes), while others converge to a
 catastrophically aggressive policy ($100\%$ crash), yielding high aggregate
@@ -621,7 +621,8 @@ here---PPO fails uniformly. The same swerve-to-survive caveat applies, and is in
 fact sharper here: DQN averages $44$ lane changes over ${\approx}78$ steps (one
 every ${\sim}1.8$ steps), and the aggressive training reward pays $+0.2$ per lane
 change, so part of DQN's success may be reward-driven lane oscillation rather
-than principled avoidance---the supplementary video lets the reader judge. With
+than principled avoidance. A second supplementary \code{merge-v0} video shows DQN
+completing the merge while PPO collides on identical traffic. With
 that caveat, this second environment \emph{strengthens} the central claim:
 near-identical episodic return can co-exist with an all-or-nothing difference in
 how the agent drives, and this is not specific to a single benchmark.

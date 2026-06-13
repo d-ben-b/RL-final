@@ -13,7 +13,9 @@
 - **結論泛化到第二個環境。** 在 `merge-v0`（n=3）三者訓練獎勵更緊密（58–59，σ≤0.3），但 **DQN 碰撞率 0%、PPO 兩個變體皆 100%（所有 seed 一致）**——印證「return parity 掩蓋行為發散」並非單一 benchmark 的偶然。
 - **獎勵設計才是駕駛風格的主控桿**，而非演算法或架構選擇；但即使同一獎勵，不同 seed 仍可能收斂到相反行為（reward shaping 約束方向，不保證收斂到目標 basin）。
 
-🎬 **成果影片**：[`demo_dqn_vs_ppo_merge.mp4`](demo_dqn_vs_ppo_merge.mp4) — merge-v0 上同場景並排：DQN 安全合流 vs PPO 全速衝撞（100% 撞車）。
+🎬 **成果影片**（同場景並排，上 DQN／下 PPO，紅字 CRASHED）：
+- [`demo_highway_dqn_vs_ppo.mp4`](demo_highway_dqn_vs_ppo.mp4) — highway-v0：DQN 存活 vs PPO+Attention 衝撞（對應 Table III 的 11.3% vs 60.7% 撞車率）
+- [`demo_merge_dqn_vs_ppo.mp4`](demo_merge_dqn_vs_ppo.mp4) — merge-v0：DQN 完成合流 vs PPO 100% 撞車（對應 Table VI 泛化結果）
 
 📄 **論文**：[`paper.tex`](paper.tex) / `paper.pdf`（IEEE conference 格式，7 頁）。
 
@@ -100,9 +102,10 @@ python src/plot_comparison.py --pattern aggressive_highway  # mean±std 學習�
 
 ### 產生成果影片
 ```bash
-python src/make_video.py --env merge-v0 --episodes 4 --out logs/demo_merge.mp4
+python src/make_video.py --env highway-v0 --dqn_seed 2 --ppo_seed 1 --out logs/demo_highway.mp4
+python src/make_video.py --env merge-v0 --out logs/demo_merge.mp4
 # 壓縮為小檔（不是壓縮檔，是降解析度/位元率）
-ffmpeg -y -i logs/demo_merge.mp4 -vf "scale=1000:-2:flags=lanczos" -r 10 -c:v libx264 -pix_fmt yuv420p -crf 26 -preset slow demo_dqn_vs_ppo_merge.mp4
+ffmpeg -y -i logs/demo_highway.mp4 -vf "scale=1000:-2:flags=lanczos" -r 10 -c:v libx264 -pix_fmt yuv420p -crf 26 -preset slow demo_highway_dqn_vs_ppo.mp4
 ```
 
 ---
@@ -133,7 +136,7 @@ ffmpeg -y -i logs/demo_merge.mp4 -vf "scale=1000:-2:flags=lanczos" -r 10 -c:v li
 | 報告書（IEEE 7 頁） | `paper.tex` → `paper.pdf` |
 | 程式碼 | `src/` |
 | 資料集 | 由訓練產生（`logs/`, `models/`），無外部 dataset |
-| 成果影片 | `demo_dqn_vs_ppo_merge.mp4`（450 KB） |
+| 成果影片 | `demo_highway_dqn_vs_ppo.mp4`（252 KB）+ `demo_merge_dqn_vs_ppo.mp4`（357 KB） |
 
 ---
 
